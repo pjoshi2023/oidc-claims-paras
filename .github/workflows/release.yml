@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Download code
         uses: actions/checkout@v4
+
+      - name: check release from printf
         run: |
           RELEASE_VERSION=$(./gradlew printProperties | grep version | awk '{print $2}')
           echo "RELEASE_VERSION=$RELEASE_VERSION
