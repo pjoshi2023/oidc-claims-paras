@@ -14,11 +14,6 @@ jobs:
       - name: Download code
         uses: actions/checkout@v4
 
-      - name: check release from printf
-        run: |
-          RELEASE_VERSION=$(./gradlew printProperties | grep version | awk '{print $2}')
-          echo "RELEASE_VERSION"=$RELEASE_VERSION
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -54,15 +49,27 @@ jobs:
       - name: Download code
         uses: actions/checkout@v3
 
+      - name: Conventional changelog action
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          skip-tag: "true"
+
       - name: Fetch release version from build gradle file
         run: |
           RELEASE_VERSION=$(./gradlew printProperties | grep version | awk '{print $2}')
           echo "RELEASE_VERSION" is $RELEASE_VERSION
-          export RELEASE_VERSION
+        env:
+          RELEASE_VERSION: $RELEASE_VERSION
 
-      - name: print release version
+      - name: Create git tag
         run: |
-          echo "Exported RELEASE_VERSION" is $RELEASE_VERSION
+           git config user.name pjoshi2023
+           git config user.email paras.joshi@curity.io
+           git tag -a $RELEASE_VERSION -m "$RELEASE_VERSION"
+           git push origin $RELEASE_VERSION
+
       - name: Download plugin artifacts
         uses: actions/download-artifact@v2
         with:
@@ -74,12 +81,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.RELEASE_VERSION }}
-          release_name: ${{ env.RELEASE_VERSION }}
-#          body: ${{ steps.changelog.outputs.clean_changelog }}
+          tag_name: ${{ $RELEASE_VERSION }}
+          release_name: ${{ $RELEASE_VERSION }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
           draft: false
           prerelease: false
 
+      - name: Upload release asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./plugin-artifacts.zip
+          asset_name: plugin-artifacts.zip
+          asset_content_type: application/zip
 
 
 
