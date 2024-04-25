@@ -58,18 +58,18 @@ jobs:
 
       - name: Fetch release version from build gradle file
         run: |
-          RELEASE_VERSION=$(./gradlew printProperties | grep version | awk '{print $2}')
+          RELEASE_VERSION=$(./gradlew printProperties | grep version | awk '{print $2}') >> $GITHUB_ENV
           echo "RELEASE_VERSION" is $RELEASE_VERSION
         env:
           RELEASE_VERSION: $RELEASE_VERSION
 
       - name: Create git tag
         run: |
-           echo "Today is ${{ env.RELEASE_VERSION }}
+           echo 'Today is ${{ env.RELEASE_VERSION }}'
            git config user.name pjoshi2023
            git config user.email paras.joshi@curity.io
-           git tag -a "$RELEASE_VERSION" -m "$RELEASE_VERSION"
-           git push origin "$RELEASE_VERSION"
+           git tag -a ${{ env.RELEASE_VERSION }} -m "${{ env.RELEASE_VERSION }}"
+           git push origin ${{ env.RELEASE_VERSION }}
 
       - name: Download plugin artifacts
         uses: actions/download-artifact@v2
