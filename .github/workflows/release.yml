@@ -67,8 +67,8 @@ jobs:
         run: |
            git config user.name pjoshi2023
            git config user.email paras.joshi@curity.io
-           git tag -a $RELEASE_VERSION -m "$RELEASE_VERSION"
-           git push origin $RELEASE_VERSION
+           git tag -a ${{ env.RELEASE_VERSION }} -m ${{ env.RELEASE_VERSION }}
+           git push origin ${{ env.RELEASE_VERSION }}
 
       - name: Download plugin artifacts
         uses: actions/download-artifact@v2
