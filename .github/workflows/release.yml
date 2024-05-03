@@ -70,7 +70,7 @@ jobs:
            git config user.name pjoshi2023
            git config user.email paras.joshi@curity.io
            git tag -a $version -m "$version"
-           git push origin $version
+           git push -f origin $version
 
       - name: Download plugin artifacts
         uses: actions/download-artifact@v2
